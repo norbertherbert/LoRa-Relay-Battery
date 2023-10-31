@@ -237,54 +237,54 @@ let calculate = () => {
     
 
 
-    // Consumed charge per Day for CHANNEL ACTIVITY DETECTION [uA*ms/Day]
+    // Consumed electric charge per Day for CHANNEL ACTIVITY DETECTION [uA*ms/Day]
     let cad = cad_per_day * (
         RADIO_RX_CURRENT * (cad_duration+cad2_duration*is_2nd_ch_active) 
         + TCXO_CURRENT * TCXO_STARTUP_TIME
         + (1+is_2nd_ch_active) * UC_ACTIVE_CURRENT * UC_WAKEUP_TIME 
     ); // [uA*ms/Day]
 
-    // Consumed charge per Day for SYNCHRONIZATION [uA*ms/Day]
+    // Consumed electric charge per Day for SYNCHRONIZATION [uA*ms/Day]
     let sync = total_ul_per_day * (
         RADIO_RX_CURRENT * min(avg_sync_time,cad_period)
         + UC_ACTIVE_CURRENT * UC_WAKEUP_TIME
     ); // [uA*ms/Day]
     
-    // Consumed charge per Day for WAKE ON RADIO [uA*ms/Day]
+    // Consumed electric charge per Day for WAKE ON RADIO [uA*ms/Day]
     let wor =(total_ul_per_day+cad_per_day*false_wor_detect_percent/100)*(wor_duration+wor2_duration)/2*RADIO_RX_CURRENT;
     wor += total_ul_per_day*UC_WAKEUP_TIME*UC_ACTIVE_CURRENT;                              // [uA*ms/Day]
     
-    // Consumed charge per Day for WOR ACK [uA*ms/Day]
+    // Consumed electric charge per Day for WOR ACK [uA*ms/Day]
     let ack = total_ul_per_day * (
         RADIO_TX_CURRENT * (ack_duration+ack2_duration)/2
         + UC_ACTIVE_CURRENT * UC_WAKEUP_TIME
     ); // [uA*ms/Day]
     
-    // Consumed charge per Day for Receiving Uplink Frames [uA*ms/Day]
+    // Consumed electric charge per Day for Receiving Uplink Frames [uA*ms/Day]
     let rx_ul = total_ul_per_day * (
         RADIO_RX_CURRENT * relay_ul_rx_duration
         + UC_ACTIVE_CURRENT * UC_WAKEUP_TIME
     ); // [uA*ms/Day]
     
-    // Consumed charge per Day for Transmitting Uplink Frames [uA*ms/Day]
+    // Consumed electric charge per Day for Transmitting Uplink Frames [uA*ms/Day]
     let tx_ul = total_ul_per_day * (
         RADIO_TX_CURRENT * relay_ul_tx_duration
         + UC_ACTIVE_CURRENT * UC_WAKEUP_TIME
     ); // [uA*ms/Day]
     
-    // Consumed charge per Day for Receiving Downlink Frames [uA*ms/Day]
+    // Consumed electric charge per Day for Receiving Downlink Frames [uA*ms/Day]
     let rx_dl = total_dl_per_day * (
         RADIO_RX_CURRENT * relay_dl_rx_duration
         + UC_ACTIVE_CURRENT * UC_WAKEUP_TIME
     ); // [uA*ms/Day]
     
-    // Consumed charge per Day for Transmitting Downink Frames [uA*ms/Day]
+    // Consumed electric charge per Day for Transmitting Downink Frames [uA*ms/Day]
     let tx_dl = total_dl_per_day * (
         RADIO_TX_CURRENT * relay_dl_tx_duration
         + UC_ACTIVE_CURRENT * UC_WAKEUP_TIME
     ); // [uA*ms/Day]
     
-    // Consumed charge per Day while SLEEPING [uA*ms/Day]
+    // Consumed electric charge per Day while SLEEPING [uA*ms/Day]
     let sleep = 
         RADIO_SLEEP_CURRENT * (
             24*60*60*1000
@@ -303,7 +303,7 @@ let calculate = () => {
                        * 1_000_000 * 3_600_000 / 30                                      // [uA*ms/Day]
                        + BATTERY_LEAK_CURRENT * 24 * 3_600_000;                          // [uA*ms/Day]
 
-    // Total consumed charge [uA*ms/Day]
+    // Total consumed electric charge [uA*ms/Day]
     let sum = cad + sync + wor + ack + rx_ul + tx_ul + rx_dl + tx_dl + sleep + battery_leak;
 
     // The total charge taken out from the battery in a day in [uAh/day]
@@ -339,37 +339,37 @@ let calculate = () => {
 
 
 
-    // Consumed charge per Day for SYNCHRONIZATION [uA*ms/Day]
+    // Consumed electric charge per Day for SYNCHRONIZATION [uA*ms/Day]
     let ed_sync = min(avg_sync_time, cad_period) * RADIO_TX_CURRENT * ed_ul_per_day;
 
-    // Consumed charge per Day for WAKE ON RADIO [uA*ms/Day]
+    // Consumed electric charge per Day for WAKE ON RADIO [uA*ms/Day]
     let ed_wor = ed_wor_duration * RADIO_TX_CURRENT * ed_ul_per_day;
 
-    // Consumed charge per Day for WAKE ON RADIO ACKNOWLEDGMENTS [uA*ms/Day]
+    // Consumed electric charge per Day for WAKE ON RADIO ACKNOWLEDGMENTS [uA*ms/Day]
     let ed_ack = ed_ack_duration * RADIO_RX_CURRENT * ed_ul_per_day;
 
-    // Consumed charge per Day for transmitting an Uplink frame [uA*ms/Day]
+    // Consumed electric charge per Day for transmitting an Uplink frame [uA*ms/Day]
     let ed_tx_ul = relay_ul_rx_duration * RADIO_TX_CURRENT * ed_ul_per_day;
 
-    // Consumed charge per Day for opening the RX1 receive window [uA*ms/Day]
+    // Consumed electric charge per Day for opening the RX1 receive window [uA*ms/Day]
     let ed_rx1 = rx1_duration * RADIO_RX_CURRENT * ed_ul_per_day;
     
-    // Consumed charge per Day for opening the RX2 receive window [uA*ms/Day]
+    // Consumed electric charge per Day for opening the RX2 receive window [uA*ms/Day]
     let ed_rx2 = rx2_duration * RADIO_RX_CURRENT * ed_ul_per_day;
     
-    // Consumed charge per Day for opening the RX3 receive window [uA*ms/Day]
+    // Consumed electric charge per Day for opening the RX3 receive window [uA*ms/Day]
     let ed_rx3 = rx3_duration * RADIO_RX_CURRENT * (ed_ul_per_day - ed_dl_per_day);
     
-    // Consumed charge per Day for receiving a Downlink frame [uA*ms/Day]
+    // Consumed electric charge per Day for receiving a Downlink frame [uA*ms/Day]
     let ed_rx_dl = relay_dl_tx_duration * RADIO_RX_CURRENT * ed_dl_per_day;
 
-    // Consumed charge per Day by Battery Leakage [uA*ms/Day]
+    // Consumed electric charge per Day by Battery Leakage [uA*ms/Day]
     let ed_battery_leak = ed_battery_count * BATTERY[ed_battery_type].nominal_capacity   // [Ah/Month]
                           * BATTERY_LEAK_PERCENT_PER_MONTH * (1/2)                       // [Ah/Month]
                           * 1_000_000 * 3_600_000 / 30                                   // [uA*ms/Day]
                           + BATTERY_LEAK_CURRENT * 24 * 3_600_000;                       // [uA*ms/Day]
 
-    // Total consumed charge [uA*ms/Day]
+    // Total consumed electric charge [uA*ms/Day]
     let ed_sum = ed_sync + ed_wor + ed_ack + ed_tx_ul + ed_rx1 + ed_rx2 + ed_rx3 + ed_rx_dl + ed_battery_leak;
 
     // The total charge taken out from the battery in a day in [uAh/day]
