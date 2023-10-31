@@ -173,10 +173,10 @@ let calculate = () => {
         relay_battery_count, // the number of batteries in the Relay
         ed_count,            // the number of relayed End-devices managed by the Relay
         ed_ul_sf,            // the SF used to send Uplink messages from an End-devices
-        ed_ul_day,           // the number of Uplink messages sent by an End-device on a day
+        ed_ul_per_day,       // the number of Uplink messages sent by an End-device on a day
         ed_ul_size,          // the size of Uplink messages sent by an End-device [bytes]
         ed_dl_sf,            // the SF used to send Downlink messages from an End-device
-        ed_dl_day,           // the number of Downlink messages sent by an End-device on a day 
+        ed_dl_per_day,       // the number of Downlink messages sent by an End-device on a day 
         ed_dl_size,          // the size of Downlink messages sent by an End-device [bytes]
         ed_battery_type,     // the type of the battery of End-devices
         ed_battery_count     // the number of batteries in an End-device
@@ -190,120 +190,114 @@ let calculate = () => {
     // number of CAD in a day 
     let cad_per_day = 24*60*60*1000 / cad_period;
 
-    // number of symbols per a CAD in the default CAD channel
-    let cad_symbols = CAD_SYMBOLS_125["SF"+cad_sf];
+    // number of symbols in a CAD of the default CAD channel
+    let cad_num_of_symbols = CAD_SYMBOLS_125["SF"+cad_sf];
 
-    // number of symbols per a CAD in the 2nd CAD channel
-    let cad_symbols2 = CAD_SYMBOLS_125["SF"+cad_sf2];
-
-    // time between Uplink frames sent by a relayed End-device [ms]
-    let ed_ul_period = 24*60*60*1000 / ed_ul_day;
+    // number of symbols in a CAD of the 2nd CAD channel
+    let cad2_num_of_symbols = CAD_SYMBOLS_125["SF"+cad_sf2];
     
-    // Time of the CAD of the default CAD channel [ms]
-    let toa_cad = TOA_SYMBOL_125["SF"+cad_sf] * cad_symbols;
+    // The duration of a CAD of the default CAD channel [ms]
+    let cad_duration = TOA_SYMBOL_125["SF"+cad_sf] * cad_num_of_symbols;
 
-    // Time of the CAD of the 2nd CAD channel [ms]
-    let toa_cad2 = TOA_SYMBOL_125["SF"+cad_sf2] * cad_symbols2;
+    // The duration of a CAD of the 2nd CAD channel [ms]
+    let cad2_duration = TOA_SYMBOL_125["SF"+cad_sf2] * cad2_num_of_symbols;
 
-    // Time on Air (TOA) of a Wake on Radio (WOR) frame sent on the default CAD channel [ms] 
-    let toa_wor = TOA_WOR_125["SF"+cad_sf];
+    // The duration of a Wake on Radio (WOR) frame sent on the default CAD channel [ms] 
+    let wor_duration = TOA_WOR_125["SF"+cad_sf];
 
-    // Time on Air (TOA) of a Wake on Radio (WOR) frame sent on the 2nd CAD channel [ms]
-    let toa_wor2 = TOA_WOR_125["SF"+cad_sf2];
+    // The duration of a Wake on Radio (WOR) frame sent on the 2nd CAD channel [ms]
+    let wor2_duration = TOA_WOR_125["SF"+cad_sf2];
 
-    // Time on Air (TOA) of an ACK frame sent on the default CAD channel [ms] 
-    let toa_ack = TOA_ACK_125["SF"+cad_sf];
+    // The duration of a WOR ACK frame sent on the default CAD channel [ms] 
+    let ack_duration = TOA_ACK_125["SF"+cad_sf];
 
-    // Time on Air (TOA) of an ACK frame sent on the 2nd CAD channel [ms]
-    let toa_ack2 = TOA_ACK_125["SF"+cad_sf2];
-
-    // Time of an Uplink RX slot of the Relay for receiving frames from an End-device [ms]
-    let toa_uplink_rx = TOA_DATA_125["SF"+ed_ul_sf+"DL"+ed_ul_size];
-
-    // Time of a Uplink TX sent by the Relay to a Gateway [ms]
-    let toa_uplink_tx = TOA_DATA_125["SF"+relay_to_gw_sf+"DL"+ed_ul_size];
+    // The duration of a WOR ACK frame sent on the 2nd CAD channel [ms]
+    let ack2_duration = TOA_ACK_125["SF"+cad_sf2];
 
     // Total number of Uplink messages sent by all End-devices 
-    let ul_per_day = ed_count * ed_ul_day;
+    let total_ul_per_day = ed_count * ed_ul_per_day;
 
     // Total number of Downlink messages sent to all End-devices 
-    let dl_per_day = ed_count * ed_dl_day;
-    
-    // Time of the Downlink RX slot of the Relay for receiving frames from a Gateway [ms]
-    let toa_downlink_rx = TOA_DATA_125["SF"+gw_to_relay_sf+"DL"+ed_dl_size];
-        
-    // Time of a Downlink TX sent by the Relay to an End-device [ms]
-    let toa_downlink_tx = TOA_DATA_125["SF"+ed_dl_sf+"DL"+ed_dl_size];
-    
+    let total_dl_per_day = ed_count * ed_dl_per_day;
+
     // Average synchronization time [ms]
-    let avg_sync_time = ed_ul_period * PPM_DRIFT / 1_000_000;
+    let avg_sync_time = (24*60*60*1000 / ed_ul_per_day) * (PPM_DRIFT / 1_000_000);
 
+    // The duration of an Uplink Data Frame received at the Relay from an End-device [ms]
+    let relay_ul_rx_duration = TOA_DATA_125["SF"+ed_ul_sf+"DL"+ed_ul_size];
 
-
-
+    // The duration of an Uplink Data Frame sent by the Relay to a Gateway [ms]
+    let relay_ul_tx_duration = TOA_DATA_125["SF"+relay_to_gw_sf+"DL"+ed_ul_size];
+    
+    // The duration of a Downlink Data Frame received at the Relay from a Gateway [ms]
+    let relay_dl_rx_duration = TOA_DATA_125["SF"+gw_to_relay_sf+"DL"+ed_dl_size];
+        
+    // The duration of a Downlink Data Frame sent by the Relay to an End-device [ms]
+    let relay_dl_tx_duration = TOA_DATA_125["SF"+ed_dl_sf+"DL"+ed_dl_size];
+    
 
 
     // Consumed charge per Day for CHANNEL ACTIVITY DETECTION [uA*ms/Day]
     let cad = cad_per_day * (
-        RADIO_RX_CURRENT * (toa_cad+toa_cad2*is_2nd_ch_active) 
+        RADIO_RX_CURRENT * (cad_duration+cad2_duration*is_2nd_ch_active) 
         + TCXO_CURRENT * TCXO_STARTUP_TIME
         + (1+is_2nd_ch_active) * UC_ACTIVE_CURRENT * UC_WAKEUP_TIME 
     ); // [uA*ms/Day]
 
     // Consumed charge per Day for SYNCHRONIZATION [uA*ms/Day]
-    let sync = ul_per_day * (
+    let sync = total_ul_per_day * (
         RADIO_RX_CURRENT * min(avg_sync_time,cad_period)
         + UC_ACTIVE_CURRENT * UC_WAKEUP_TIME
     ); // [uA*ms/Day]
     
     // Consumed charge per Day for WAKE ON RADIO [uA*ms/Day]
-    let wor =(ul_per_day+cad_per_day*false_wor_detect_percent/100)*(toa_wor+toa_wor2)/2*RADIO_RX_CURRENT;
-    wor += ul_per_day*UC_WAKEUP_TIME*UC_ACTIVE_CURRENT;                              // [uA*ms/Day]
+    let wor =(total_ul_per_day+cad_per_day*false_wor_detect_percent/100)*(wor_duration+wor2_duration)/2*RADIO_RX_CURRENT;
+    wor += total_ul_per_day*UC_WAKEUP_TIME*UC_ACTIVE_CURRENT;                              // [uA*ms/Day]
     
-    // Consumed charge per Day for WAKE ON RADIO ACKNOWLEDGMENTS [uA*ms/Day]
-    let ack = ul_per_day * (
-        RADIO_TX_CURRENT * (toa_ack+toa_ack2)/2
+    // Consumed charge per Day for WOR ACK [uA*ms/Day]
+    let ack = total_ul_per_day * (
+        RADIO_TX_CURRENT * (ack_duration+ack2_duration)/2
         + UC_ACTIVE_CURRENT * UC_WAKEUP_TIME
     ); // [uA*ms/Day]
     
-    // Consumed charge per Day for receiving Uplink frames [uA*ms/Day]
-    let rx_ul = ul_per_day * (
-        RADIO_RX_CURRENT * toa_uplink_rx
+    // Consumed charge per Day for Receiving Uplink Frames [uA*ms/Day]
+    let rx_ul = total_ul_per_day * (
+        RADIO_RX_CURRENT * relay_ul_rx_duration
         + UC_ACTIVE_CURRENT * UC_WAKEUP_TIME
     ); // [uA*ms/Day]
     
-    // Consumed charge per Day for transmitting Uplink frames [uA*ms/Day]
-    let tx_ul = ul_per_day * (
-        RADIO_TX_CURRENT * toa_uplink_tx
+    // Consumed charge per Day for Transmitting Uplink Frames [uA*ms/Day]
+    let tx_ul = total_ul_per_day * (
+        RADIO_TX_CURRENT * relay_ul_tx_duration
         + UC_ACTIVE_CURRENT * UC_WAKEUP_TIME
     ); // [uA*ms/Day]
     
-    // Consumed charge per Day for receiving Downlink frames [uA*ms/Day]
-    let rx_dl = dl_per_day * (
-        RADIO_RX_CURRENT * toa_downlink_rx
+    // Consumed charge per Day for Receiving Downlink Frames [uA*ms/Day]
+    let rx_dl = total_dl_per_day * (
+        RADIO_RX_CURRENT * relay_dl_rx_duration
         + UC_ACTIVE_CURRENT * UC_WAKEUP_TIME
     ); // [uA*ms/Day]
     
-    // Consumed charge per Day for transmitting Downink frames [uA*ms/Day]
-    let tx_dl = dl_per_day * (
-        RADIO_TX_CURRENT * toa_downlink_tx
+    // Consumed charge per Day for Transmitting Downink Frames [uA*ms/Day]
+    let tx_dl = total_dl_per_day * (
+        RADIO_TX_CURRENT * relay_dl_tx_duration
         + UC_ACTIVE_CURRENT * UC_WAKEUP_TIME
     ); // [uA*ms/Day]
     
-    // Consumed charge per Day while sleeping [uA*ms/Day]
+    // Consumed charge per Day while SLEEPING [uA*ms/Day]
     let sleep = 
         RADIO_SLEEP_CURRENT * (
             24*60*60*1000
-            - cad_per_day * toa_cad
-            - ul_per_day  * (toa_wor + toa_ack + toa_uplink_rx + toa_uplink_tx)
-            - dl_per_day  * (toa_downlink_rx + toa_downlink_tx)
+            - cad_per_day * cad_duration
+            - total_ul_per_day  * (wor_duration + ack_duration + relay_ul_rx_duration + relay_ul_tx_duration)
+            - total_dl_per_day  * (relay_dl_rx_duration + relay_dl_tx_duration)
         )
         + UC_SLEEP_CURRENT * (
             24*60*60*1000
-            - (cad_per_day + 3*ul_per_day + dl_per_day) * UC_WAKEUP_TIME
+            - (cad_per_day + 3*total_ul_per_day + total_dl_per_day) * UC_WAKEUP_TIME
         ); // [uA*ms/Day]
 
-    // Consumed charge per Day by Battery Leakage [uA*ms/Day]
+    // Lost charge per Day because of Battery Leakage [uA*ms/Day]
     let battery_leak = ed_battery_count * BATTERY[relay_battery_type].nominal_capacity   // [Ah/Month]
                        * BATTERY_LEAK_PERCENT_PER_MONTH * (1/2)                          // [Ah/Month]
                        * 1_000_000 * 3_600_000 / 30                                      // [uA*ms/Day]
@@ -312,14 +306,14 @@ let calculate = () => {
     // Total consumed charge [uA*ms/Day]
     let sum = cad + sync + wor + ack + rx_ul + tx_ul + rx_dl + tx_dl + sleep + battery_leak;
 
-    // The total consumed charge from the battery in [uAh/day]
+    // The total charge taken out from the battery in a day in [uAh/day]
     let battery_consumption_per_day = sum / (3_600_000);
 
     // The total usable battery capacity [Ah]
     let battery_capacity = relay_battery_count * BATTERY[relay_battery_type].nominal_capacity  // [Ah]
                            * BATTERY_PRACTICAL_CAPACITY_PARCENT * 1_000_000;                   // [uAh]
 
-    // the estimated battery life on [Years]
+    // The estimated battery life on [Years]
     let battery_life = battery_capacity / (battery_consumption_per_day * 365);                 // [Years]
 
 
@@ -327,53 +321,47 @@ let calculate = () => {
     // * CALCULATE END-DEVICE RESULTS
     // ***********************************
 
-    // The time of a Wake on Radio frame [ms]
+    // The duration of a Wake on Radio (WOR) frame [ms]
     let ed_wor_duration = TOA_WOR_125["SF"+cad_sf];
 
-    // The time of a Wake on Radio Acknoledgment frame [ms]
+    // The duration of a WOR ACK Frame [ms]
     let ed_ack_duration = TOA_ACK_125["SF"+cad_sf];
 
-    // The Time on Air of an Uplink frame sent by a relayed End-device [ms]
-    let ed_ul_toa = TOA_DATA_125["SF"+ed_ul_sf+"DL"+ed_ul_size];
+    // The duration of the RX1 receive window on End-device [ms]
+    let rx1_duration = max(6, TOA_SYMBOL_125["SF"+ed_dl_sf]*6);
 
-    // The Time on Air of a Downlink frame received by a relayed End-device [ms]
-    let ed_dl_toa = TOA_DATA_125["SF"+ed_dl_sf+"DL"+ed_dl_size];
+    // The duration of the RX2 receive window on End-device [ms]
+    let rx2_duration = max(6, TOA_SYMBOL_125["SF12"]*6);
 
-    // The RX1 timeout on a relayed End-device [ms]
-    let ed_rx1_timeout = max(6, TOA_SYMBOL_125["SF"+ed_dl_sf]*6);
-
-    // The RX2 timeout on a relayed End-device [ms]
-    let ed_rx2_timeout = max(6, TOA_SYMBOL_125["SF12"]*6);
-
-    // The RX3 timeout on a relayed End-device [ms]
-    let ed_rx3_timeout = max(6, TOA_SYMBOL_125["SF"+cad_sf]*6);
+    // The duration of the RX3 receive window on End-device [ms]
+    let rx3_duration = max(6, TOA_SYMBOL_125["SF"+cad_sf]*6);
 
 
 
 
     // Consumed charge per Day for SYNCHRONIZATION [uA*ms/Day]
-    let ed_sync = min(avg_sync_time, cad_period) * RADIO_TX_CURRENT * ed_ul_day;
+    let ed_sync = min(avg_sync_time, cad_period) * RADIO_TX_CURRENT * ed_ul_per_day;
 
     // Consumed charge per Day for WAKE ON RADIO [uA*ms/Day]
-    let ed_wor = ed_wor_duration * RADIO_TX_CURRENT * ed_ul_day;
+    let ed_wor = ed_wor_duration * RADIO_TX_CURRENT * ed_ul_per_day;
 
     // Consumed charge per Day for WAKE ON RADIO ACKNOWLEDGMENTS [uA*ms/Day]
-    let ed_ack = ed_ack_duration * RADIO_RX_CURRENT * ed_ul_day;
+    let ed_ack = ed_ack_duration * RADIO_RX_CURRENT * ed_ul_per_day;
 
     // Consumed charge per Day for transmitting an Uplink frame [uA*ms/Day]
-    let ed_tx_ul = ed_ul_toa     * RADIO_TX_CURRENT * ed_ul_day;
+    let ed_tx_ul = relay_ul_rx_duration * RADIO_TX_CURRENT * ed_ul_per_day;
 
     // Consumed charge per Day for opening the RX1 receive window [uA*ms/Day]
-    let ed_rx1 = ed_rx1_timeout  * RADIO_RX_CURRENT * ed_ul_day;
+    let ed_rx1 = rx1_duration * RADIO_RX_CURRENT * ed_ul_per_day;
     
     // Consumed charge per Day for opening the RX2 receive window [uA*ms/Day]
-    let ed_rx2 = ed_rx2_timeout  * RADIO_RX_CURRENT * ed_ul_day;
+    let ed_rx2 = rx2_duration * RADIO_RX_CURRENT * ed_ul_per_day;
     
     // Consumed charge per Day for opening the RX3 receive window [uA*ms/Day]
-    let ed_rx3 = ed_rx3_timeout  * RADIO_RX_CURRENT * (ed_ul_day - ed_dl_day);
+    let ed_rx3 = rx3_duration * RADIO_RX_CURRENT * (ed_ul_per_day - ed_dl_per_day);
     
     // Consumed charge per Day for receiving a Downlink frame [uA*ms/Day]
-    let ed_rx_dl = ed_dl_toa     * RADIO_RX_CURRENT * ed_dl_day;
+    let ed_rx_dl = relay_dl_tx_duration * RADIO_RX_CURRENT * ed_dl_per_day;
 
     // Consumed charge per Day by Battery Leakage [uA*ms/Day]
     let ed_battery_leak = ed_battery_count * BATTERY[ed_battery_type].nominal_capacity   // [Ah/Month]
@@ -384,14 +372,14 @@ let calculate = () => {
     // Total consumed charge [uA*ms/Day]
     let ed_sum = ed_sync + ed_wor + ed_ack + ed_tx_ul + ed_rx1 + ed_rx2 + ed_rx3 + ed_rx_dl + ed_battery_leak;
 
-    // The total consumed charge from the battery in [uAh/day]
+    // The total charge taken out from the battery in a day in [uAh/day]
     let ed_battery_consumption_per_day = ed_sum / (3_600_000);
 
     // The total usable battery capacity [Ah]
     let ed_battery_capacity = ed_battery_count * BATTERY[ed_battery_type].nominal_capacity        // Ah
                               * BATTERY_PRACTICAL_CAPACITY_PARCENT * 1_000_000;                   // uAh
 
-    // the estimated battery life on [Years]
+    // The estimated battery life in [Years]
     let ed_battery_life = ed_battery_capacity / (ed_battery_consumption_per_day * 365);    // years
     
 
