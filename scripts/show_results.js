@@ -1,7 +1,7 @@
 showResults = ({
     cad, sync, wor, ack, rx_ul, tx_ul, rx_dl, tx_dl, sleep, battery_leak,
     battery_consumption_per_day, battery_life,
-    ed_sync, ed_wor, ed_ack, ed_tx_ul, ed_rx1, ed_rx2, ed_rx3, ed_rx_dl, ed_battery_leak, 
+    ed_sync, ed_wor, ed_ack, ed_tx_ul, ed_rx1, ed_rx2, ed_rx3, ed_rx_dl, ed_sleep, ed_battery_leak, 
     ed_battery_consumption_per_day, ed_battery_life,
 }) => {
 
@@ -43,21 +43,21 @@ showResults = ({
         },
         data: [{
             type: "pie",
-            startAngle: 240,
+            startAngle: 270,
             // yValueFormatString: "##0.00\"%\"",
             yValueFormatString: "##0.00",
             indexLabel: "{label} {y}",
             dataPoints: [
-                {y: cad/3_600_000, label: "CAD"},
-                {y: sync/3_600_000, label: "Sync"},
-                {y: wor/3_600_000, label: "WOR"},
-                {y: ack/3_600_000, label: "ACK"},
-                {y: rx_ul/3_600_000, label: "RX Uplink"},
-                {y: tx_ul/3_600_000, label: "TX Uplink"},
-                {y: rx_dl/3_600_000, label: "RX Downlink"},
-                {y: tx_dl/3_600_000, label: "TX Downlink"},
-                {y: sleep/3_600_000, label: "Sleep"},
-                {y: battery_leak/3_600_000, label: "Battery Leak"},
+                {y: cad/3_600_000, label: "CAD:"},
+                {y: sync/3_600_000, label: "Sync:"},
+                {y: wor/3_600_000, label: "RX WOR:"},
+                {y: ack/3_600_000, label: "TX WOR ACK:"},
+                {y: rx_ul/3_600_000, label: "RX UL Data:"},
+                {y: tx_ul/3_600_000, label: "TX UL Data:"},
+                {y: rx_dl/3_600_000, label: "RX DL Data:"},
+                {y: tx_dl/3_600_000, label: "TX DL Data:"},
+                {y: sleep/3_600_000, label: "Sleep:"},
+                {y: battery_leak/3_600_000, label: "Battery Leak:"},
             ]
         }]
     });
@@ -92,20 +92,21 @@ showResults = ({
         },
         data: [{
             type: "pie",
-            startAngle: 240,
+            startAngle: 270,
             // yValueFormatString: "##0.00\"%\"",
             yValueFormatString: "##0.00",
             indexLabel: "{label} {y}",
             dataPoints: [
-                {y: ed_sync/3_600_000, label: "Sync"},
-                {y: ed_wor/3_600_000, label: "WOR"},
-                {y: ed_ack/3_600_000, label: "ACK"},
-                {y: ed_tx_ul/3_600_000, label: "TX Uplink"},
-                {y: ed_rx1/3_600_000, label: "RX1"},
-                {y: ed_rx2/3_600_000, label: "RX2"},
-                {y: ed_rx3/3_600_000, label: "RX3"},
-                {y: ed_rx_dl/3_600_000, label: "RX Downlink"},
-                {y: ed_battery_leak/3_600_000, label: "Battery Leak"},
+                {y: ed_sync/3_600_000, label: "Sync:"},
+                {y: ed_wor/3_600_000, label: "TX WOR:"},
+                {y: ed_ack/3_600_000, label: "RX WOR ACK:"},
+                {y: ed_tx_ul/3_600_000, label: "TX UL Data:"},
+                {y: ed_rx1/3_600_000, label: "RX1:"},
+                {y: ed_rx2/3_600_000, label: "RX2:"},
+                {y: ed_rx3/3_600_000, label: "RX3:"},
+                {y: ed_rx_dl/3_600_000, label: "RX DL Data:"},
+                {y: ed_sleep/3_600_000, label: "Sleep:"},
+                {y: ed_battery_leak/3_600_000, label: "Battery Leak:"},
             ]
         }]
     });

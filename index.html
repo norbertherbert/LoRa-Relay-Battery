@@ -6,47 +6,7 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>LoRa Relay battery life estimation tool</title>
-  <style>
-    html, body {
-        font-family: Verdana, sans-serif;
-    }
-    .main_container {
-        display: flex;
-        justify-content: flex-start;
-        flex-wrap: wrap;
-        padding: 10px;
-    }
-    .row_container {
-        flex-wrap: wrap;
-        display: flex;
-        justify-content: flex-start;
-        padding: 10px;
-    }
-    .row_item {
-        padding: 10px;
-    }
-    .chart {
-        padding: 10px;
-    }
-    .form-field {
-        padding-top: 10px;
-    }
-    input {
-        width: 100px;
-        /* text-align: right; */
-    }
-    .chart {
-        height: 400px; 
-        width: 600px;
-    }
-    input:invalid {
-        border: 2px dashed red;
-    }
-    input:valid {
-        border: 1px solid black;
-    }
-
-  </style>
+  <link href="style.css" rel="stylesheet" />
   <script src="scripts/get_params.js"></script>
   <script src="scripts/calculate.js"></script>
   <script src="scripts/show_results.js"></script>
@@ -364,12 +324,37 @@
                     <h3>Relay</h3>
                     <div id="output_relay"></div>
                     <div class="chart" id="chart_relay" ></div>
+                    <div id="explanations_relay">
+                        <pre>
+CAD: Consumed electric charge for Channel Activity Detection
+Sync: Consumed electric charge for time synchronization
+RX WOR: Consumed electric charge for receiving Wake on Radio Frames
+TX WOR ACK: Consumed electric charge for sending Wake on Radio Acknowledgments
+RX UL Data: Consumed electric charge for receiving Uplink Frames from an End-Device
+TX UL Data: Consumed electric charge for sending Uplink Frames to a Gateway
+RX DL Data: Consumed electric charge for receiving Downlink Frames from a Gateway
+TX DL Data: Consumed electric charge for sending Downlink Frames to an End-Device
+Sleep: Consumed electric charge while the device is sleeping
+Battery Leak: Lost electric charge due to the battery's self-discharge
+                        </pre>
+                    </div>
                 </div>
 
                 <div class="row_item">
                     <h3>Relayed End-device</h3>
                     <div id="output_relayed"></div>
                     <div class="chart" id="chart_relayed" ></div>
+                    <div id="explanations_relayed">
+                        <pre>
+Sync: Consumed electric charge for time synchronization
+TX WOR: Consumed electric charge for sending Wake on Radio Frames
+RX WOR ACK: Consumed electric charge for receiving Wake on Radio Acknowledgments
+TX UL Data: Consumed electric charge for sending Uplink Frames to the Relay
+RX DL Data: Consumed electric charge for receiving Downlink Frames from the Relay
+Sleep: Consumed electric charge while the device is sleeping
+Battery Leak: Lost electric charge due to the battery's self-discharge
+                        </pre>
+                    </div>
                 </div>
 
             </div>

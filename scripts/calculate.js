@@ -11,7 +11,7 @@ const TCXO_CURRENT = 1_000;       // uA
 const TCXO_STARTUP_TIME = 4;      // ms
 
 const UC_ACTIVE_CURRENT = 10_000; // uA
-const UC_SLEEP_CURRENT = 3;       // uA
+const UC_SLEEP_CURRENT = 5; //3;  // uA
 const UC_WAKEUP_TIME = 4;         // ms
 
 const BATTERY_LEAK_PERCENT_PER_MONTH     = 0     // 0.003; // % of remaining capacity is lost per month
@@ -224,16 +224,16 @@ let calculate = () => {
     let avg_sync_time = (24*60*60*1000 / ed_ul_per_day) * (PPM_DRIFT / 1_000_000);
 
     // The duration of an Uplink Data Frame received at the Relay from an End-device [ms]
-    let relay_ul_rx_duration = TOA_DATA_125["SF"+ed_ul_sf+"DL"+ed_ul_size];
+    let ul_rx_duration = TOA_DATA_125["SF"+ed_ul_sf+"DL"+ed_ul_size];
 
     // The duration of an Uplink Data Frame sent by the Relay to a Gateway [ms]
-    let relay_ul_tx_duration = TOA_DATA_125["SF"+relay_to_gw_sf+"DL"+ed_ul_size];
+    let ul_tx_duration = TOA_DATA_125["SF"+relay_to_gw_sf+"DL"+ed_ul_size];
     
     // The duration of a Downlink Data Frame received at the Relay from a Gateway [ms]
-    let relay_dl_rx_duration = TOA_DATA_125["SF"+gw_to_relay_sf+"DL"+ed_dl_size];
+    let dl_rx_duration = TOA_DATA_125["SF"+gw_to_relay_sf+"DL"+ed_dl_size];
         
     // The duration of a Downlink Data Frame sent by the Relay to an End-device [ms]
-    let relay_dl_tx_duration = TOA_DATA_125["SF"+ed_dl_sf+"DL"+ed_dl_size];
+    let dl_tx_duration = TOA_DATA_125["SF"+ed_dl_sf+"DL"+ed_dl_size];
     
 
 
@@ -262,25 +262,25 @@ let calculate = () => {
     
     // Consumed electric charge per Day for Receiving Uplink Frames [uA*ms/Day]
     let rx_ul = total_ul_per_day * (
-        RADIO_RX_CURRENT * relay_ul_rx_duration
+        RADIO_RX_CURRENT * ul_rx_duration
         + UC_ACTIVE_CURRENT * UC_WAKEUP_TIME
     ); // [uA*ms/Day]
     
     // Consumed electric charge per Day for Transmitting Uplink Frames [uA*ms/Day]
     let tx_ul = total_ul_per_day * (
-        RADIO_TX_CURRENT * relay_ul_tx_duration
+        RADIO_TX_CURRENT * ul_tx_duration
         + UC_ACTIVE_CURRENT * UC_WAKEUP_TIME
     ); // [uA*ms/Day]
     
     // Consumed electric charge per Day for Receiving Downlink Frames [uA*ms/Day]
     let rx_dl = total_dl_per_day * (
-        RADIO_RX_CURRENT * relay_dl_rx_duration
+        RADIO_RX_CURRENT * dl_rx_duration
         + UC_ACTIVE_CURRENT * UC_WAKEUP_TIME
     ); // [uA*ms/Day]
     
     // Consumed electric charge per Day for Transmitting Downink Frames [uA*ms/Day]
     let tx_dl = total_dl_per_day * (
-        RADIO_TX_CURRENT * relay_dl_tx_duration
+        RADIO_TX_CURRENT * dl_tx_duration
         + UC_ACTIVE_CURRENT * UC_WAKEUP_TIME
     ); // [uA*ms/Day]
     
@@ -289,8 +289,8 @@ let calculate = () => {
         RADIO_SLEEP_CURRENT * (
             24*60*60*1000
             - cad_per_day * cad_duration
-            - total_ul_per_day  * (wor_duration + ack_duration + relay_ul_rx_duration + relay_ul_tx_duration)
-            - total_dl_per_day  * (relay_dl_rx_duration + relay_dl_tx_duration)
+            - total_ul_per_day  * (wor_duration + ack_duration + ul_rx_duration + ul_tx_duration)
+            - total_dl_per_day  * (dl_rx_duration + dl_tx_duration)
         )
         + UC_SLEEP_CURRENT * (
             24*60*60*1000
@@ -349,7 +349,7 @@ let calculate = () => {
     let ed_ack = ed_ack_duration * RADIO_RX_CURRENT * ed_ul_per_day;
 
     // Consumed electric charge per Day for transmitting an Uplink frame [uA*ms/Day]
-    let ed_tx_ul = relay_ul_rx_duration * RADIO_TX_CURRENT * ed_ul_per_day;
+    let ed_tx_ul = ul_rx_duration * RADIO_TX_CURRENT * ed_ul_per_day;
 
     // Consumed electric charge per Day for opening the RX1 receive window [uA*ms/Day]
     let ed_rx1 = rx1_duration * RADIO_RX_CURRENT * ed_ul_per_day;
@@ -361,7 +361,23 @@ let calculate = () => {
     let ed_rx3 = rx3_duration * RADIO_RX_CURRENT * (ed_ul_per_day - ed_dl_per_day);
     
     // Consumed electric charge per Day for receiving a Downlink frame [uA*ms/Day]
-    let ed_rx_dl = relay_dl_tx_duration * RADIO_RX_CURRENT * ed_dl_per_day;
+    let ed_rx_dl = dl_tx_duration * RADIO_RX_CURRENT * ed_dl_per_day;
+
+
+
+    // Consumed electric charge per Day while SLEEPING [uA*ms/Day]
+    let ed_sleep = 
+        RADIO_SLEEP_CURRENT * (
+            24*60*60*1000
+            - ed_ul_per_day  * (ed_wor_duration + ed_ack_duration + rx1_duration + rx2_duration + rx3_duration + ul_tx_duration )
+            - ed_dl_per_day  * dl_rx_duration
+        )
+        + UC_SLEEP_CURRENT * (
+            24*60*60*1000
+            - 4*ed_ul_per_day * UC_WAKEUP_TIME
+        ); // [uA*ms/Day]
+
+
 
     // Consumed electric charge per Day by Battery Leakage [uA*ms/Day]
     let ed_battery_leak = ed_battery_count * BATTERY[ed_battery_type].nominal_capacity   // [Ah/Month]
@@ -392,7 +408,7 @@ let calculate = () => {
     showResults({
         cad, sync, wor, ack, rx_ul, tx_ul, rx_dl, tx_dl, sleep, battery_leak,
         battery_consumption_per_day, battery_life,
-        ed_sync, ed_wor, ed_ack, ed_tx_ul, ed_rx1, ed_rx2, ed_rx3, ed_rx_dl, ed_battery_leak, 
+        ed_sync, ed_wor, ed_ack, ed_tx_ul, ed_rx1, ed_rx2, ed_rx3, ed_rx_dl, ed_sleep, ed_battery_leak, 
         ed_battery_consumption_per_day, ed_battery_life,
     });
 

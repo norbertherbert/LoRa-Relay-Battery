@@ -1,0 +1,38 @@
+html, body {
+    font-family: Verdana, sans-serif;
+}
+.main_container {
+    display: flex;
+    justify-content: flex-start;
+    flex-wrap: wrap;
+    padding: 10px;
+}
+.row_container {
+    flex-wrap: wrap;
+    display: flex;
+    justify-content: flex-start;
+    padding: 10px;
+}
+.row_item {
+    padding: 10px;
+}
+.chart {
+    padding: 10px;
+}
+.form-field {
+    padding-top: 10px;
+}
+input {
+    width: 100px;
+    /* text-align: right; */
+}
+.chart {
+    height: 400px; 
+    width: 650px;
+}
+input:invalid {
+    border: 2px dashed red;
+}
+input:valid {
+    border: 1px solid black;
+}
