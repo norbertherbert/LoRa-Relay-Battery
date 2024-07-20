@@ -14,9 +14,9 @@ const UC_ACTIVE_CURRENT = 10_000; // uA
 const UC_SLEEP_CURRENT = 5; //3;  // uA
 const UC_WAKEUP_TIME = 4;         // ms
 
-const BATTERY_LEAK_PERCENT_PER_MONTH     = 0     // 0.003; // % of remaining capacity is lost per month
-const BATTERY_PRACTICAL_CAPACITY_PARCENT = 0.7;  // only 70% of nominal battery capacity can be utilized
-const BATTERY_LEAK_CURRENT               = 3;    // [uA]
+const BATTERY_DISCHARGE_PERCENT_PER_YEAR = 0.015  // % of remaining capacity is lost per year
+const BATTERY_PRACTICAL_CAPACITY_PARCENT = 0.7;   // only 70% of nominal battery capacity can be utilized
+const BATTERY_LEAK_CURRENT               = 0;     // [uA]
 
 // Crystal accuracy in parts per million (ppm)
 const PPM_DRIFT = 60;
@@ -299,8 +299,8 @@ let calculate = () => {
 
     // Lost charge per Day because of Battery Leakage [uA*ms/Day]
     let battery_leak = ed_battery_count * BATTERY[relay_battery_type].nominal_capacity   // [Ah/Month]
-                       * BATTERY_LEAK_PERCENT_PER_MONTH * (1/2)                          // [Ah/Month]
-                       * 1_000_000 * 3_600_000 / 30                                      // [uA*ms/Day]
+                       * BATTERY_DISCHARGE_PERCENT_PER_YEAR                              // [Ah/Month]
+                       * 1_000_000 * 3_600_000 / 365                                     // [uA*ms/Day]
                        + BATTERY_LEAK_CURRENT * 24 * 3_600_000;                          // [uA*ms/Day]
 
     // Total consumed electric charge [uA*ms/Day]
@@ -381,8 +381,8 @@ let calculate = () => {
 
     // Consumed electric charge per Day by Battery Leakage [uA*ms/Day]
     let ed_battery_leak = ed_battery_count * BATTERY[ed_battery_type].nominal_capacity   // [Ah/Month]
-                          * BATTERY_LEAK_PERCENT_PER_MONTH * (1/2)                       // [Ah/Month]
-                          * 1_000_000 * 3_600_000 / 30                                   // [uA*ms/Day]
+                          * BATTERY_DISCHARGE_PERCENT_PER_YEAR                           // [Ah/Month]
+                          * 1_000_000 * 3_600_000 / 365                                  // [uA*ms/Day]
                           + BATTERY_LEAK_CURRENT * 24 * 3_600_000;                       // [uA*ms/Day]
 
     // Total consumed electric charge [uA*ms/Day]
