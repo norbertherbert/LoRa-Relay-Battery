@@ -125,27 +125,30 @@ const CAD_SYMBOLS_125 = {
 // Battery options
 const BATTERY = {
     "SAFT_LS14500": {
-        nominal_capacity: 2.6, // Ah
-        power: 7_488           // mWh
+        nominal_capacity: 2.6,  // Ah
+        nominal_energy: 7_488   // mWh
     }, 
     "AA_Energizer_Ultimate": {
-        nominal_capacity: 3,   // Ah
-        power: 3_600           // mWh
+        nominal_capacity: 3,    // Ah
+        nominal_energy: 3_600   // mWh
     }, 
     "SAFT_LS17330": {
-        nominal_capacity: 2.1, // Ah
-        power: 6_048           // mWh
+        nominal_capacity: 2.1,  // Ah
+        nominal_energy: 6_048   // mWh
     }, 
     "SAFT_LS_33600": {
-        nominal_capacity: 17,  // Ah
-        power: 48_960          // mWh
+        nominal_capacity: 17,   // Ah
+        nominal_energy: 48_960  // mWh
     }, 
     "SAFT_LS_26500": {
-        nominal_capacity: 7.7, // Ah
-        power: 22_176          // mWh
+        nominal_capacity: 7.7,  // Ah
+        nominal_energy: 22_176  // mWh
+    },
+    "SAFT_M_20_EX_SV": {
+        nominal_capacity: 12.4, // Ah
+        nominal_energy: 35_000  // mWh
     },
 };
-
 
 // HELPER FUNCTIONS
 
