@@ -4,22 +4,22 @@
 
 const BATTERY_VOLTAGE = 3_300;    // mV
 
-const RADIO_TX_CURRENT = 28_000;  // uA    +14 dBm
-const RADIO_RX_CURRENT = 7_000;   // uA    Radio + TCXO
+const RADIO_TX_CURRENT = 36_500;  // uA    +14 dBm
+const RADIO_RX_CURRENT = 6_500;   // uA    Radio + TCXO
 const RADIO_SLEEP_CURRENT = 1;    // uA
 const TCXO_CURRENT = 1_000;       // uA
 const TCXO_STARTUP_TIME = 4;      // ms
 
-const UC_ACTIVE_CURRENT = 10_000; // uA
-const UC_SLEEP_CURRENT = 5; //3;  // uA
+const UC_ACTIVE_CURRENT = 10_500; // uA
+const UC_SLEEP_CURRENT = 14;      // uA
 const UC_WAKEUP_TIME = 4;         // ms
 
 const BATTERY_DISCHARGE_PERCENT_PER_YEAR = 0.015  // % of remaining capacity is lost per year
-const BATTERY_PRACTICAL_CAPACITY_PARCENT = 0.7;   // only 70% of nominal battery capacity can be utilized
-const BATTERY_LEAK_CURRENT               = 0;     // [uA]
+const BATTERY_PRACTICAL_CAPACITY_PARCENT = 0.8;   // only 80% of nominal battery capacity can be utilized
+const BATTERY_LEAK_CURRENT               = 1;     // [uA]
 
 // Crystal accuracy in parts per million (ppm)
-const PPM_DRIFT = 60;
+const PPM_DRIFT = 25;
 
 // Time on air of LoRa symbols with 125 kHz bandwidth
 // [ms]
