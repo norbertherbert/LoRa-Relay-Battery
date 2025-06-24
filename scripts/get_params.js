@@ -24,6 +24,8 @@ let getParamsFromForm = () => {
     const ed_dl_per_day = parseInt(document.getElementById("ed_dl_day").value);
     const ed_dl_size = parseInt(document.getElementById("ed_dl_size").value); // [bytes]
 
+    const ed_app_cons = document.getElementById("ed_app_cons").value;
+
     const ed_battery_type = document.getElementById("ed_battery_type").value;
     const ed_battery_count = parseInt(document.getElementById("ed_battery_count").value);
 
@@ -36,6 +38,7 @@ let getParamsFromForm = () => {
         ed_count,
         ed_ul_sf, ed_ul_per_day, ed_ul_size,
         ed_dl_sf, ed_dl_per_day, ed_dl_size,
+        ed_app_cons,
         ed_battery_type, ed_battery_count
     }
 

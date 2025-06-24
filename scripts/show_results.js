@@ -1,7 +1,9 @@
 showResults = ({
     cad, sync, wor, ack, rx_ul, tx_ul, rx_dl, tx_dl, sleep, battery_leak,
     battery_consumption_per_day, battery_life,
-    ed_sync, ed_wor, ed_ack, ed_tx_ul, ed_rx1, ed_rx2, ed_rx3, ed_rx_dl, ed_sleep, ed_battery_leak, 
+    ed_sync, ed_wor, ed_ack, ed_tx_ul, ed_rx1, ed_rx2, ed_rx3, ed_rx_dl,
+    ed_app,
+    ed_sleep, ed_battery_leak, 
     ed_battery_consumption_per_day, ed_battery_life,
 }) => {
 
@@ -105,6 +107,7 @@ showResults = ({
                 {y: ed_rx2/3_600_000, label: "RX2:"},
                 {y: ed_rx3/3_600_000, label: "RX3:"},
                 {y: ed_rx_dl/3_600_000, label: "RX DL Data:"},
+                {y: ed_app/3_600_000, label: "App:"},
                 {y: ed_sleep/3_600_000, label: "Sleep:"},
                 {y: ed_battery_leak/3_600_000, label: "Battery Leak:"},
             ]

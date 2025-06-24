@@ -181,6 +181,7 @@ let calculate = () => {
         ed_dl_sf,            // the SF used to send Downlink messages from an End-device
         ed_dl_per_day,       // the number of Downlink messages sent by an End-device on a day 
         ed_dl_size,          // the size of Downlink messages sent by an End-device [bytes]
+        ed_app_cons,         // the energy consumption of the end-device's application [uAh/h]
         ed_battery_type,     // the type of the battery of End-devices
         ed_battery_count     // the number of batteries in an End-device
     } = getParamsFromForm();
@@ -368,6 +369,12 @@ let calculate = () => {
 
 
 
+
+    // The energy consumption of the end-device's application
+    let ed_app = ed_app_cons*24*3_600_000;                                               // [uA*ms/Day]               [uAh/h]=[uA*3_600_000ms/(1/24Day)]=[uA*ms/Day]*24*3_600_000
+
+
+
     // Consumed electric charge per Day while SLEEPING [uA*ms/Day]
     let ed_sleep = 
         RADIO_SLEEP_CURRENT * (
@@ -389,7 +396,7 @@ let calculate = () => {
                           + BATTERY_LEAK_CURRENT * 24 * 3_600_000;                       // [uA*ms/Day]
 
     // Total consumed electric charge [uA*ms/Day]
-    let ed_sum = ed_sync + ed_wor + ed_ack + ed_tx_ul + ed_rx1 + ed_rx2 + ed_rx3 + ed_rx_dl + ed_battery_leak;
+    let ed_sum = ed_sync + ed_wor + ed_ack + ed_tx_ul + ed_rx1 + ed_rx2 + ed_rx3 + ed_rx_dl + ed_app + ed_battery_leak;
 
     // The total charge taken out from the battery in a day in [uAh/day]
     let ed_battery_consumption_per_day = ed_sum / (3_600_000);
@@ -411,7 +418,9 @@ let calculate = () => {
     showResults({
         cad, sync, wor, ack, rx_ul, tx_ul, rx_dl, tx_dl, sleep, battery_leak,
         battery_consumption_per_day, battery_life,
-        ed_sync, ed_wor, ed_ack, ed_tx_ul, ed_rx1, ed_rx2, ed_rx3, ed_rx_dl, ed_sleep, ed_battery_leak, 
+        ed_sync, ed_wor, ed_ack, ed_tx_ul, ed_rx1, ed_rx2, ed_rx3, ed_rx_dl, 
+        ed_app,
+        ed_sleep, ed_battery_leak, 
         ed_battery_consumption_per_day, ed_battery_life,
     });
 
